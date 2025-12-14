@@ -1,8 +1,9 @@
-import { Moon, Sun, Search, BookOpen, Settings } from 'lucide-react';
+import { Moon, Sun, Search, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { SearchModal } from './SearchModal';
 import { SettingsModal } from './SettingsModal';
+import quranLogo from '@/assets/quran-logo.png';
 
 interface HeaderProps {
   isDarkMode: boolean;
@@ -32,9 +33,7 @@ export function Header({
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-primary" />
-            </div>
+            <img src={quranLogo} alt="القرآن الكريم" className="w-10 h-10 rounded-full object-cover" />
             <div className="hidden sm:block">
               <h1 className="text-lg font-bold font-arabic text-foreground">القرآن الكريم</h1>
               <p className="text-xs text-muted-foreground">مصحف المدينة</p>

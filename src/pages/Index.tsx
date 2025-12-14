@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Header } from '@/components/Header';
 import { SurahList } from '@/components/SurahList';
 import { QuranReader } from '@/components/QuranReader';
@@ -14,27 +14,25 @@ const Index = () => {
   const [selectedSurah, setSelectedSurah] = useState<number | null>(null);
   const [surahData, setSurahData] = useState<SurahData | null>(null);
   const [initialAyah, setInitialAyah] = useState<number | undefined>();
-
-  // Load last read surah on mount
-  useEffect(() => {
-    if (progress && !selectedSurah) {
-      setSelectedSurah(progress.surahNumber);
-      setInitialAyah(progress.ayahNumber);
-    }
-  }, [progress]);
+  const [currentReciter, setCurrentReciter] = useState(settings.reciterId);
+  const previousSurahRef = useRef<number | null>(null);
 
   // Fetch surah data when selection changes
   useEffect(() => {
     if (selectedSurah) {
-      fetchSurah(selectedSurah, settings.reciterId).then(data => {
+      fetchSurah(selectedSurah, currentReciter).then(data => {
         if (data) setSurahData(data);
       });
     }
-  }, [selectedSurah, settings.reciterId, fetchSurah]);
+  }, [selectedSurah, currentReciter, fetchSurah]);
 
   const handleSurahSelect = useCallback((surahNumber: number) => {
+    // Reset to ayah 1 when selecting a new surah
+    if (previousSurahRef.current !== surahNumber) {
+      setInitialAyah(1);
+    }
+    previousSurahRef.current = surahNumber;
     setSelectedSurah(surahNumber);
-    setInitialAyah(undefined);
     setSurahData(null);
   }, []);
 
@@ -44,6 +42,11 @@ const Index = () => {
 
   const handlePrayerModalClose = useCallback(() => {
     updateSettings({ hasSeenPrayerModal: true });
+  }, [updateSettings]);
+
+  const handleReciterChange = useCallback((reciterId: string) => {
+    setCurrentReciter(reciterId);
+    updateSettings({ reciterId });
   }, [updateSettings]);
 
   return (
@@ -60,15 +63,15 @@ const Index = () => {
         onToggleDarkMode={() => updateSettings({ isDarkMode: !settings.isDarkMode })}
         fontSize={settings.fontSize}
         onFontSizeChange={(size) => updateSettings({ fontSize: size })}
-        reciterId={settings.reciterId}
-        onReciterChange={(id) => updateSettings({ reciterId: id })}
+        reciterId={currentReciter}
+        onReciterChange={handleReciterChange}
         onSurahSelect={handleSurahSelect}
       />
 
       {/* Main Content */}
       <main className="flex-1 container mx-auto px-4 py-6">
         <div className="flex gap-6 h-[calc(100vh-200px)]">
-          {/* Sidebar - Desktop */}
+          {/* Sidebar - Desktop - Always visible */}
           <aside className="hidden lg:block w-80 flex-shrink-0">
             <SurahList
               selectedSurah={selectedSurah}
@@ -86,6 +89,8 @@ const Index = () => {
               fontSize={settings.fontSize}
               onAyahRead={handleAyahRead}
               initialAyah={initialAyah}
+              reciterId={currentReciter}
+              onReciterChange={handleReciterChange}
             />
           </div>
         </div>

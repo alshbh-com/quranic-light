@@ -21,7 +21,7 @@ const STORAGE_KEYS = {
 const DEFAULT_SETTINGS: QuranSettings = {
   reciterId: 'ar.alafasy',
   fontSize: 28,
-  isDarkMode: false,
+  isDarkMode: true, // Dark mode as default
   hasSeenPrayerModal: false,
 };
 
@@ -40,6 +40,9 @@ export function useQuranStorage() {
       const savedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
       if (savedSettings) {
         setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(savedSettings) });
+      } else {
+        // Apply default dark mode on first visit
+        document.documentElement.classList.add('dark');
       }
     } catch (error) {
       console.error('Error loading from localStorage:', error);
