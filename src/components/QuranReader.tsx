@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { SurahData, Ayah } from '@/hooks/useQuranApi';
+import { SurahData } from '@/hooks/useQuranApi';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AudioPlayer } from './AudioPlayer';
-import { Loader2, BookOpen } from 'lucide-react';
+import { TafsirPanel } from './TafsirPanel';
+import { ReciterSelector } from './ReciterSelector';
+import { Loader2, BookOpen, BookText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface QuranReaderProps {
   surahData: SurahData | null;
@@ -11,6 +14,8 @@ interface QuranReaderProps {
   fontSize: number;
   onAyahRead: (surahNumber: number, ayahNumber: number) => void;
   initialAyah?: number;
+  reciterId: string;
+  onReciterChange: (id: string) => void;
 }
 
 export function QuranReader({ 
@@ -19,23 +24,28 @@ export function QuranReader({
   error, 
   fontSize, 
   onAyahRead,
-  initialAyah 
+  initialAyah,
+  reciterId,
+  onReciterChange
 }: QuranReaderProps) {
   const [currentAyah, setCurrentAyah] = useState<number>(1);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showTafsir, setShowTafsir] = useState(false);
   const ayahRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to initial ayah on surah load
+  // Reset to ayah 1 when surah changes
   useEffect(() => {
-    if (surahData && initialAyah) {
-      setCurrentAyah(initialAyah);
-      setTimeout(() => {
-        const ayahElement = ayahRefs.current.get(initialAyah);
-        if (ayahElement) {
-          ayahElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 300);
+    if (surahData) {
+      setCurrentAyah(initialAyah || 1);
+      if (initialAyah && initialAyah > 1) {
+        setTimeout(() => {
+          const ayahElement = ayahRefs.current.get(initialAyah);
+          if (ayahElement) {
+            ayahElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 300);
+      }
     }
   }, [surahData?.number, initialAyah]);
 
@@ -102,50 +112,73 @@ export function QuranReader({
   return (
     <div className="h-full flex flex-col bg-card rounded-xl shadow-card border border-border overflow-hidden">
       {/* Surah Header */}
-      <div className="p-6 border-b border-border text-center bg-gradient-to-b from-secondary/50 to-transparent">
-        <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 text-primary text-sm mb-3">
+      <div className="p-4 border-b border-border text-center bg-gradient-to-b from-secondary/50 to-transparent">
+        <div className="flex items-center justify-between mb-2">
+          <ReciterSelector reciterId={reciterId} onReciterChange={onReciterChange} />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowTafsir(!showTafsir)}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <BookText className="w-4 h-4 ml-1" />
+            <span className="text-xs">التفسير</span>
+          </Button>
+        </div>
+        <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 text-primary text-sm mb-2">
           <span>{surahData.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</span>
           <span>•</span>
           <span>{surahData.numberOfAyahs} آية</span>
         </div>
-        <h2 className="text-3xl font-bold font-arabic text-foreground mb-1">
+        <h2 className="text-2xl font-bold font-arabic text-foreground mb-1">
           سورة {surahData.name.replace('سُورَةُ ', '')}
         </h2>
-        <p className="text-muted-foreground text-sm">{surahData.englishNameTranslation}</p>
         
         {/* Bismillah - except for Surah At-Tawbah */}
         {surahData.number !== 9 && surahData.number !== 1 && (
-          <p className="mt-6 text-2xl font-quran text-foreground">
+          <p className="mt-4 text-xl font-quran text-foreground">
             بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
           </p>
         )}
       </div>
 
-      {/* Ayahs */}
-      <ScrollArea className="flex-1 scrollbar-thin" ref={scrollAreaRef}>
-        <div className="p-6 leading-loose" dir="rtl">
-          <p className="text-center" style={{ fontSize: `${fontSize}px`, lineHeight: '2.4' }}>
-            {surahData.ayahs.map((ayah) => (
-              <span
-                key={ayah.numberInSurah}
-                ref={(el) => {
-                  if (el) ayahRefs.current.set(ayah.numberInSurah, el);
-                }}
-                onClick={() => handleAyahClick(ayah.numberInSurah)}
-                className={`
-                  font-quran cursor-pointer transition-all duration-300 hover:text-primary
-                  ${currentAyah === ayah.numberInSurah && isPlaying ? 'ayah-playing text-primary' : 'text-foreground'}
-                `}
-              >
-                {ayah.text}
-                <span className="inline-flex items-center justify-center w-8 h-8 mx-1 text-sm bg-primary/10 text-primary rounded-full font-sans">
-                  {ayah.numberInSurah}
+      {/* Content Area */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Ayahs */}
+        <ScrollArea className={`flex-1 scrollbar-thin ${showTafsir ? 'lg:w-1/2' : 'w-full'}`} ref={scrollAreaRef}>
+          <div className="p-6 leading-loose" dir="rtl">
+            <p className="text-center" style={{ fontSize: `${fontSize}px`, lineHeight: '2.4' }}>
+              {surahData.ayahs.map((ayah) => (
+                <span
+                  key={ayah.numberInSurah}
+                  ref={(el) => {
+                    if (el) ayahRefs.current.set(ayah.numberInSurah, el);
+                  }}
+                  onClick={() => handleAyahClick(ayah.numberInSurah)}
+                  className={`
+                    font-quran cursor-pointer transition-all duration-300 hover:text-primary
+                    ${currentAyah === ayah.numberInSurah && isPlaying ? 'ayah-playing text-primary' : 'text-foreground'}
+                  `}
+                >
+                  {ayah.text}
+                  <span className="inline-flex items-center justify-center w-8 h-8 mx-1 text-sm bg-primary/10 text-primary rounded-full font-sans">
+                    {ayah.numberInSurah}
+                  </span>
                 </span>
-              </span>
-            ))}
-          </p>
-        </div>
-      </ScrollArea>
+              ))}
+            </p>
+          </div>
+        </ScrollArea>
+
+        {/* Tafsir Panel */}
+        {showTafsir && (
+          <TafsirPanel
+            surahNumber={surahData.number}
+            ayahNumber={currentAyah}
+            onClose={() => setShowTafsir(false)}
+          />
+        )}
+      </div>
 
       {/* Audio Player */}
       <AudioPlayer
