@@ -136,7 +136,7 @@ export function AudioPlayer({
             {surahName}
           </p>
           <p className="text-xs text-muted-foreground">
-            {currentAyah.numberInSurah === 0 ? 'البسملة' : `الآية ${currentAyah.numberInSurah} من ${totalAyahs}`}
+            الآية {currentAyah.numberInSurah} من {totalAyahs}
           </p>
         </div>
 
@@ -146,7 +146,7 @@ export function AudioPlayer({
             variant="ghost"
             size="icon"
             onClick={onPrevious}
-            disabled={currentAyah.numberInSurah <= 0}
+            disabled={currentAyah.numberInSurah <= 1}
             className="text-foreground hover:bg-secondary"
           >
             <SkipForward className="w-5 h-5" />
