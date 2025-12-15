@@ -111,43 +111,42 @@ export function QuranReader({
 
   return (
     <div className="h-full flex flex-col bg-card rounded-xl shadow-card border border-border overflow-hidden">
-      {/* Surah Header */}
-      <div className="p-4 border-b border-border text-center bg-gradient-to-b from-secondary/50 to-transparent">
-        <div className="flex items-center justify-between mb-2">
+      {/* Surah Header - Compact */}
+      <div className="p-2 sm:p-3 border-b border-border text-center bg-gradient-to-b from-secondary/50 to-transparent">
+        <div className="flex items-center justify-between mb-1">
           <ReciterSelector reciterId={reciterId} onReciterChange={onReciterChange} />
           <Button
-            variant="ghost"
+            variant={showTafsir ? "default" : "ghost"}
             size="sm"
             onClick={() => setShowTafsir(!showTafsir)}
-            className="text-muted-foreground hover:text-foreground"
+            className="text-xs h-7"
           >
-            <BookText className="w-4 h-4 ml-1" />
-            <span className="text-xs">التفسير</span>
+            <BookText className="w-3 h-3 ml-1" />
+            التفسير
           </Button>
         </div>
-        <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 text-primary text-sm mb-2">
+        <h2 className="text-lg sm:text-xl font-bold font-arabic text-foreground">
+          سورة {surahData.name.replace('سُورَةُ ', '')}
+        </h2>
+        <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
           <span>{surahData.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</span>
           <span>•</span>
           <span>{surahData.numberOfAyahs} آية</span>
         </div>
-        <h2 className="text-2xl font-bold font-arabic text-foreground mb-1">
-          سورة {surahData.name.replace('سُورَةُ ', '')}
-        </h2>
-        
-        {/* Bismillah - except for Surah At-Tawbah */}
-        {surahData.number !== 9 && surahData.number !== 1 && (
-          <p className="mt-4 text-xl font-quran text-foreground">
-            بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-          </p>
-        )}
       </div>
 
-      {/* Content Area */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Ayahs */}
-        <ScrollArea className={`flex-1 scrollbar-thin ${showTafsir ? 'lg:w-1/2' : 'w-full'}`} ref={scrollAreaRef}>
-          <div className="p-6 leading-loose" dir="rtl">
-            <p className="text-center" style={{ fontSize: `${fontSize}px`, lineHeight: '2.4' }}>
+      {/* Content Area - Takes remaining space */}
+      <div className="flex-1 flex overflow-hidden min-h-0">
+        {/* Ayahs - Full height scroll */}
+        <ScrollArea className={`flex-1 h-full ${showTafsir ? 'lg:w-1/2' : 'w-full'}`} ref={scrollAreaRef}>
+          <div className="p-3 sm:p-4 pb-20" dir="rtl">
+            {/* Bismillah - except for Surah At-Tawbah */}
+            {surahData.number !== 9 && surahData.number !== 1 && (
+              <p className="text-center text-lg sm:text-xl font-quran text-foreground mb-4">
+                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+              </p>
+            )}
+            <p className="text-center leading-[2.2] sm:leading-[2.5]" style={{ fontSize: `${fontSize}px` }}>
               {surahData.ayahs.map((ayah) => (
                 <span
                   key={ayah.numberInSurah}
@@ -156,12 +155,12 @@ export function QuranReader({
                   }}
                   onClick={() => handleAyahClick(ayah.numberInSurah)}
                   className={`
-                    font-quran cursor-pointer transition-all duration-300 hover:text-primary
+                    font-quran cursor-pointer transition-all duration-300 hover:text-primary inline
                     ${currentAyah === ayah.numberInSurah && isPlaying ? 'ayah-playing text-primary' : 'text-foreground'}
                   `}
                 >
                   {ayah.text}
-                  <span className="inline-flex items-center justify-center w-8 h-8 mx-1 text-sm bg-primary/10 text-primary rounded-full font-sans">
+                  <span className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 mx-1 text-xs bg-primary/10 text-primary rounded-full font-sans align-middle">
                     {ayah.numberInSurah}
                   </span>
                 </span>
@@ -170,7 +169,7 @@ export function QuranReader({
           </div>
         </ScrollArea>
 
-        {/* Tafsir Panel */}
+        {/* Tafsir Panel - Side panel on desktop */}
         {showTafsir && (
           <TafsirPanel
             surahNumber={surahData.number}

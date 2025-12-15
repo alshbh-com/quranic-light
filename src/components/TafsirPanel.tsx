@@ -40,34 +40,34 @@ export function TafsirPanel({ surahNumber, ayahNumber, onClose }: TafsirPanelPro
   }, [surahNumber, ayahNumber]);
 
   return (
-    <div className="hidden lg:flex flex-col w-1/2 border-r border-border bg-secondary/20">
-      <div className="flex items-center justify-between p-3 border-b border-border">
+    <div className="flex flex-col w-full lg:w-1/2 border-r border-border bg-secondary/30">
+      <div className="flex items-center justify-between p-2 border-b border-border bg-secondary/50">
         <h3 className="font-bold font-arabic text-foreground text-sm">
           تفسير الآية {ayahNumber}
         </h3>
-        <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
+        <Button variant="ghost" size="icon" onClick={onClose} className="h-7 w-7">
           <X className="w-4 h-4" />
         </Button>
       </div>
       
-      <ScrollArea className="flex-1">
-        <div className="p-4" dir="rtl">
+      <ScrollArea className="flex-1 h-full">
+        <div className="p-3" dir="rtl">
           {loading && (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="w-6 h-6 text-primary animate-spin" />
+            <div className="flex items-center justify-center py-6">
+              <Loader2 className="w-5 h-5 text-primary animate-spin" />
             </div>
           )}
           
           {error && (
-            <p className="text-center text-muted-foreground text-sm py-8">{error}</p>
+            <p className="text-center text-muted-foreground text-sm py-6">{error}</p>
           )}
           
           {tafsir && !loading && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <p className="text-sm leading-relaxed font-arabic text-foreground/90">
                 {tafsir}
               </p>
-              <p className="text-xs text-muted-foreground text-center mt-4">
+              <p className="text-xs text-muted-foreground text-center pt-2 border-t border-border">
                 التفسير الميسر
               </p>
             </div>
