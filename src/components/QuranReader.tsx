@@ -28,7 +28,7 @@ export function QuranReader({
   reciterId,
   onReciterChange
 }: QuranReaderProps) {
-  const [currentAyah, setCurrentAyah] = useState<number>(0);
+  const [currentAyah, setCurrentAyah] = useState<number>(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showTafsir, setShowTafsir] = useState(false);
   const ayahRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
@@ -37,9 +37,7 @@ export function QuranReader({
   // Reset when surah changes
   useEffect(() => {
     if (surahData) {
-      // Use initialAyah if provided, otherwise start from 0 (Bismillah) or 1
-      const startAyah = (surahData.number === 1 || surahData.number === 9) ? 1 : 0;
-      setCurrentAyah(initialAyah ?? startAyah);
+      setCurrentAyah(initialAyah ?? 1);
     }
   }, [surahData?.number]);
 
@@ -181,7 +179,7 @@ export function QuranReader({
         onAyahEnd={handleAyahEnd}
         onPlayingChange={setIsPlaying}
         isPlaying={isPlaying}
-        onPrevious={() => setCurrentAyah(prev => Math.max(0, prev - 1))}
+        onPrevious={() => setCurrentAyah(prev => Math.max(1, prev - 1))}
         onNext={() => setCurrentAyah(prev => Math.min(surahData.numberOfAyahs, prev + 1))}
       />
     </div>
