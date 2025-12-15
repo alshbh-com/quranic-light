@@ -48,13 +48,30 @@ export function useQuranApi() {
       const surah = textData.data;
       const audioAyahs = audioData.data.ayahs;
 
+      // Create ayahs array
+      const ayahs: Ayah[] = [];
+
+      // Add Bismillah as ayah 0 for all surahs except Al-Fatiha (1) and At-Tawbah (9)
+      if (surahNumber !== 1 && surahNumber !== 9) {
+        // Get Bismillah audio from the first ayah of Al-Fatiha
+        const bismillahAudioUrl = `https://cdn.islamic.network/quran/audio/128/${reciterId.replace('ar.', '')}/1.mp3`;
+        ayahs.push({
+          number: 0,
+          text: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+          numberInSurah: 0,
+          audio: bismillahAudioUrl,
+        });
+      }
+
       // Merge text and audio data
-      const ayahs: Ayah[] = surah.ayahs.map((ayah: any, index: number) => ({
-        number: ayah.number,
-        text: ayah.text,
-        numberInSurah: ayah.numberInSurah,
-        audio: audioAyahs[index]?.audio,
-      }));
+      surah.ayahs.forEach((ayah: any, index: number) => {
+        ayahs.push({
+          number: ayah.number,
+          text: ayah.text,
+          numberInSurah: ayah.numberInSurah,
+          audio: audioAyahs[index]?.audio,
+        });
+      });
 
       return {
         number: surah.number,
