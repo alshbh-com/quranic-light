@@ -34,14 +34,14 @@ export function QuranReader({
   const ayahRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  // Reset to ayah 0 (Bismillah) when surah changes
+  // Reset when surah changes
   useEffect(() => {
     if (surahData) {
-      // Start from Bismillah (0) for all surahs except Al-Fatiha and At-Tawbah
+      // Use initialAyah if provided, otherwise start from 0 (Bismillah) or 1
       const startAyah = (surahData.number === 1 || surahData.number === 9) ? 1 : 0;
-      setCurrentAyah(initialAyah !== undefined ? initialAyah : startAyah);
+      setCurrentAyah(initialAyah ?? startAyah);
     }
-  }, [surahData?.number, initialAyah]);
+  }, [surahData?.number]);
 
   // Save reading progress
   useEffect(() => {
