@@ -69,39 +69,52 @@ const Index = () => {
       />
 
       {/* Main Content */}
-      <main className="flex-1 container mx-auto px-4 py-6">
-        <div className="flex gap-6 h-[calc(100vh-200px)]">
-          {/* Sidebar - Desktop - Always visible */}
-          <aside className="hidden lg:block w-80 flex-shrink-0">
+      <main className="flex-1 container mx-auto px-2 sm:px-4 py-2 sm:py-4">
+        {/* Show Surah List when no surah selected */}
+        {!selectedSurah ? (
+          <div className="h-[calc(100vh-140px)]">
             <SurahList
               selectedSurah={selectedSurah}
               onSurahSelect={handleSurahSelect}
               lastReadSurah={progress?.surahNumber}
             />
-          </aside>
-
-          {/* Reader */}
-          <div className="flex-1 min-w-0">
-            <QuranReader
-              surahData={surahData}
-              loading={loading}
-              error={error}
-              fontSize={settings.fontSize}
-              onAyahRead={handleAyahRead}
-              initialAyah={initialAyah}
-              reciterId={currentReciter}
-              onReciterChange={handleReciterChange}
-            />
           </div>
-        </div>
+        ) : (
+          <div className="flex gap-4 h-[calc(100vh-140px)]">
+            {/* Sidebar - Desktop */}
+            <aside className="hidden lg:block w-72 flex-shrink-0">
+              <SurahList
+                selectedSurah={selectedSurah}
+                onSurahSelect={handleSurahSelect}
+                lastReadSurah={progress?.surahNumber}
+              />
+            </aside>
+
+            {/* Reader - Full height */}
+            <div className="flex-1 min-w-0 h-full">
+              <QuranReader
+                surahData={surahData}
+                loading={loading}
+                error={error}
+                fontSize={settings.fontSize}
+                onAyahRead={handleAyahRead}
+                initialAyah={initialAyah}
+                reciterId={currentReciter}
+                onReciterChange={handleReciterChange}
+              />
+            </div>
+          </div>
+        )}
       </main>
 
-      {/* Mobile Surah Drawer */}
-      <MobileSurahDrawer
-        selectedSurah={selectedSurah}
-        onSurahSelect={handleSurahSelect}
-        lastReadSurah={progress?.surahNumber}
-      />
+      {/* Mobile Surah Drawer - Only when reading */}
+      {selectedSurah && (
+        <MobileSurahDrawer
+          selectedSurah={selectedSurah}
+          onSurahSelect={handleSurahSelect}
+          lastReadSurah={progress?.surahNumber}
+        />
+      )}
 
       {/* Footer */}
       <Footer />
