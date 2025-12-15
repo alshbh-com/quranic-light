@@ -27,9 +27,11 @@ const Index = () => {
   }, [selectedSurah, currentReciter, fetchSurah]);
 
   const handleSurahSelect = useCallback((surahNumber: number) => {
-    // Reset to ayah 1 when selecting a new surah
+    // Reset to beginning when selecting a new surah
     if (previousSurahRef.current !== surahNumber) {
-      setInitialAyah(1);
+      // Start from 0 (Bismillah) for all surahs except Al-Fatiha and At-Tawbah
+      const startAyah = (surahNumber === 1 || surahNumber === 9) ? 1 : 0;
+      setInitialAyah(startAyah);
     }
     previousSurahRef.current = surahNumber;
     setSelectedSurah(surahNumber);
